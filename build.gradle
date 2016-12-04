@@ -1,0 +1,109 @@
+import groovy.xml.XmlUtil
+
+plugins {
+    id "java"
+    id "application"
+    id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "maven-publish"
+    id "edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin" version "1.5.1"
+    id "checkstyle"
+    id "pmd"
+    id "findbugs"
+    id "jacoco"
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop'
+
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact(shadowJar) {
+                classifier null
+            }
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'SmartDashboard'
+            version WPILibVersion.version
+        }
+    }
+}
+
+test {
+    testLogging {
+        events "started", "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
+
+checkstyle {
+    configFile = new File(rootDir, "checkstyle.xml")
+    toolVersion = '6.19'
+    if (project.hasProperty("ignoreCheckstyle")) {
+        ignoreFailures = true
+    }
+}
+
+pmd {
+    consoleOutput = true
+    sourceSets = [sourceSets.main, sourceSets.test]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSetFiles = files(new File(rootDir, "pmd-ruleset.xml"))
+    ruleSets = []
+}
+
+findbugs {
+    sourceSets = [sourceSets.main, sourceSets.test]
+    excludeFilter = new File(rootDir, "findBugsSuppressions.xml")
+    effort = "max"
+}
+
+ext.printReportSafe = { xmlReport ->
+    if (xmlReport.exists()) {
+        def bugs = (new XmlParser().parse(xmlReport)).BugInstance
+        bugs.each { System.out.println(new XmlUtil().serialize(it)) }
+    }
+}
+
+task findbugsMainReport
+task findbugsTestReport
+
+findbugsMainReport.doLast {
+    printReportSafe(findbugsMain.reports.getXml().destination)
+}
+
+findbugsTestReport.doLast {
+    printReportSafe(findbugsTest.reports.getXml().destination)
+}
+
+findbugsMain.finalizedBy findbugsMainReport
+findbugsTest.finalizedBy findbugsTestReport
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
+// already specified on the command line
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+mainClassName = "edu.wpi.first.smartdashboard.SmartDashboard"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2.1'
+}
