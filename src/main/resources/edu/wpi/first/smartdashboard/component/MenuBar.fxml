@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+
+<MenuBar xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.wpi.first.smartdashboard.component.MenuBarController">
+   <menus>
+      <Menu mnemonicParsing="false" text="File">
+         <items>
+            <MenuItem fx:id="newMenuItem" mnemonicParsing="false" text="New" />
+         </items>
+      </Menu>
+      <Menu mnemonicParsing="false" text="Edit">
+         <items>
+            <Menu mnemonicParsing="false" text="Add...">
+              <items>
+                <MenuItem fx:id="addTestRecMenuItem" mnemonicParsing="false" text="Test Rec" />
+              </items>
+            </Menu>
+         </items>
+      </Menu>
+      <Menu mnemonicParsing="false" text="Help">
+         <items>
+            <MenuItem mnemonicParsing="false" text="About" />
+         </items>
+      </Menu>
+   </menus>
+</MenuBar>
