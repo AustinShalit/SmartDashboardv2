@@ -1,8 +1,9 @@
 package edu.wpi.first.smartdashboard;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -23,10 +24,11 @@ public class SmartDashboard extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    StackPane root = new StackPane();
+    Parent root = FXMLLoader.load(getClass().getResource("MainWindow.fxml"));
 
     primaryStage.setTitle("SmartDashboard");
-    primaryStage.setScene(new Scene(root, 480, 360));
+    primaryStage.setScene(new Scene(root));
     primaryStage.show();
   }
+
 }
